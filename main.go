@@ -1,14 +1,20 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/bits-and-blooms/bloom/v3"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const googleMapsAPIURL = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -22,6 +28,21 @@ type GeocodeResponse struct {
 		} `json:"address_components"`
 	} `json:"results"`
 	Status string `json:"status"`
+}
+
+type Address struct {
+	CEP          string `json:"cep" bson:"cep"`
+	Country      string `json:"country" bson:"country"`
+	State        string `json:"state" bson:"state"`
+	City         string `json:"city" bson:"city"`
+	Neighborhood string `json:"neighborhood" bson:"neighborhood"`
+	Street       string `json:"street" bson:"street"`
+}
+
+var bloomFilter *bloom.BloomFilter
+
+func initBloomFilter() {
+	bloomFilter = bloom.NewWithEstimates(10000, 0.01)
 }
 
 func getGeocodeData(cep, apiKey string) (*GeocodeResponse, error) {
@@ -45,17 +66,96 @@ func getGeocodeData(cep, apiKey string) (*GeocodeResponse, error) {
 	return &geocodeResponse, nil
 }
 
+func saveAddressToMongo(address Address) error {
+	mongoURI := os.Getenv("MONGO_URI")
+	if mongoURI == "" {
+		return fmt.Errorf("MONGO_URI is missing")
+	}
+
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
+	if err != nil {
+		return fmt.Errorf("failed to create mongo client: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	err = client.Connect(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to connect to mongo: %v", err)
+	}
+	defer client.Disconnect(ctx)
+
+	collection := client.Database("geocode").Collection("addresses")
+	_, err = collection.InsertOne(ctx, address)
+	if err != nil {
+		return fmt.Errorf("failed to insert address: %v", err)
+	}
+
+	bloomFilter.AddString(address.CEP)
+
+	return nil
+}
+
+func getAddressFromMongo(cep string) (*Address, error) {
+	mongoURI := os.Getenv("MONGO_URI")
+	if mongoURI == "" {
+		return nil, fmt.Errorf("MONGO_URI is missing")
+	}
+
+	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create mongo client: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	err = client.Connect(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to mongo: %v", err)
+	}
+	defer client.Disconnect(ctx)
+
+	collection := client.Database("geocode").Collection("addresses")
+	var address Address
+	err = collection.FindOne(ctx, bson.M{"cep": cep}).Decode(&address)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to find address: %v", err)
+	}
+
+	return &address, nil
+}
+
 func handler(w http.ResponseWriter, r *http.Request) {
 	cep := r.URL.Query().Get("cep")
+	apiKey := os.Getenv("GOOGLE_MAPS_API_KEY")
+
 	if cep == "" {
 		http.Error(w, "CEP is required", http.StatusBadRequest)
 		return
 	}
 
-	apiKey := os.Getenv("GOOGLE_MAPS_API_KEY")
 	if apiKey == "" {
-		http.Error(w, "Google Maps API key is not set", http.StatusInternalServerError)
+		http.Error(w, "API Key is missing", http.StatusInternalServerError)
 		return
+	}
+
+	if bloomFilter.TestString(cep) {
+		address, err := getAddressFromMongo(cep)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if address != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(address)
+			return
+		}
 	}
 
 	geocodeData, err := getGeocodeData(cep, apiKey)
@@ -69,22 +169,28 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	address := make(map[string]string)
+	address := &Address{CEP: cep}
 	for _, component := range geocodeData.Results[0].AddressComponents {
 		for _, t := range component.Types {
 			switch t {
 			case "country":
-				address["country"] = component.LongName
+				address.Country = component.LongName
 			case "administrative_area_level_1":
-				address["state"] = component.LongName
+				address.State = component.LongName
 			case "administrative_area_level_2":
-				address["city"] = component.LongName
+				address.City = component.LongName
 			case "sublocality_level_1", "sublocality", "neighborhood":
-				address["neighborhood"] = component.LongName
+				address.Neighborhood = component.LongName
 			case "route":
-				address["street"] = component.LongName
+				address.Street = component.LongName
 			}
 		}
+	}
+
+	err = saveAddressToMongo(*address)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -96,6 +202,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	initBloomFilter()
+
 	http.HandleFunc("/geocode", handler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
