@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+      - mock-google-maps
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  mock-google-maps:
+    image: clue/json-server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./mock-db.json:/data/db.json
+
+volumes:
+  mongo-data:
