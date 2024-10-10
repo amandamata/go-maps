@@ -1,0 +1,28 @@
+services:
+  # app:
+  #   build: .
+  #   ports:
+  #     - "8080:8080"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - mongo
+  #     - mock-server
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  mock-server:
+    image: mockoon/cli:latest
+    command: ["--data", "data", "--port", "3001"]
+    volumes:
+      - ./mock/maps.json:/data
+    ports:
+      - "3001:3001"
+
+volumes:
+  mongo-data:

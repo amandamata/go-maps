@@ -8,8 +8,6 @@ import (
 	"go-maps/src/repositories"
 	"net/http"
 	"os"
-
-	"github.com/bits-and-blooms/bloom/v3"
 )
 
 type AddressController struct {
@@ -24,12 +22,6 @@ func NewAddressController() *AddressController {
 	return &AddressController{repo: *addressRepository}
 }
 
-var bloomFilter *bloom.BloomFilter
-
-func initBloomFilter() {
-	bloomFilter = bloom.NewWithEstimates(10000, 0.01)
-}
-
 func (c *AddressController) Zipcode(w http.ResponseWriter, r *http.Request) {
 	zipcode := r.URL.Query().Get("zipcode")
 
@@ -38,18 +30,16 @@ func (c *AddressController) Zipcode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if bloomFilter.TestString(zipcode) {
-		address, err := c.repo.FindByZipcode(zipcode)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	address, err := c.repo.FindByZipcode(zipcode)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-		if address != nil {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(address)
-			return
-		}
+	if address != nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(address)
+		return
 	}
 
 	geocodeData, err := getGeocodeData(zipcode)
@@ -63,7 +53,7 @@ func (c *AddressController) Zipcode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	address := &db.Address{Zipcode: zipcode}
+	address = &db.Address{Zipcode: zipcode}
 	for _, component := range geocodeData.Results[0].AddressComponents {
 		for _, t := range component.Types {
 			switch t {
@@ -86,8 +76,6 @@ func (c *AddressController) Zipcode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	bloomFilter.AddString(address.Zipcode)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(address)

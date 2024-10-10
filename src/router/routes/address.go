@@ -7,16 +7,9 @@ import (
 
 var addressController = controllers.NewAddressController()
 
-type Route struct {
-	Uri                    string
-	Method                 string
-	Function               http.HandlerFunc
-	AuthenticationRequired bool
-}
-
-var loginRoutes = []Route{
+var addressRoutes = []Route{
 	{
-		Uri:                    "/zipcode",
+		Uri:                    "/address",
 		Method:                 http.MethodGet,
 		Function:               addressController.Zipcode,
 		AuthenticationRequired: false,

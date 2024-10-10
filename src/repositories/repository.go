@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"fmt"
+	"go-maps/src"
 	"go-maps/src/db"
 	"os"
 	"time"
@@ -18,6 +19,7 @@ type AddressRepository struct {
 }
 
 func NewRepository() (*AddressRepository, error) {
+	src.LoadDBEnvs()
 	mongoURI := os.Getenv("MONGO_URI")
 	if mongoURI == "" {
 		return nil, fmt.Errorf("MONGO_URI is missing")

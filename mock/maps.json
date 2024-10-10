@@ -1,0 +1,206 @@
+{
+  "uuid": "3b3cf407-2ed2-4eba-a1bf-af0d6a51bd32",
+  "lastMigration": 32,
+  "name": "Maps",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 3001,
+  "hostname": "",
+  "folders": [],
+  "routes": [
+    {
+      "uuid": "16576927-42fd-45f8-870b-1aa32db1f109",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "address/:zipcode/:key",
+      "responses": [
+        {
+          "uuid": "4b475b2b-ef83-4bf9-aaf6-ae77d269abfb",
+          "body": "{\n  \"zipcode\": \"13910498\",\n  \"country\": \"Brazil\",\n  \"state\": \"São Paulo\",\n  \"city\": \"Jaguariúna\",\n  \"neighborhood\": \"Terras da Capela de Santo Antonio\",\n  \"street\": \"Avenida Novaes\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "9214dff1-09f0-4b98-aa9c-a3a8edaed351",
+          "body": "{\n  \"zipcode\": \"79983\",\n  \"country\": \"Mexico\",\n  \"state\": \"San Luis Potosí\",\n  \"city\": \"\",\n  \"neighborhood\": \"\",\n  \"street\": \"\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "484a916a-4eda-4521-827a-896cee4a7936",
+          "body": "{\n  \"zipcode\": \"44032\",\n  \"country\": \"United States\",\n  \"state\": \"Ohio\",\n  \"city\": \"Ashtabula County\",\n  \"neighborhood\": \"\",\n  \"street\": \"\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "0a5cbf23-4cb5-4796-b8ff-5a821f96b5a6",
+          "body": "{\n  \"zipcode\": \"10001\",\n  \"country\": \"United States\",\n  \"state\": \"New York\",\n  \"city\": \"\",\n  \"neighborhood\": \"Manhattan\",\n  \"street\": \"\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "332e3071-1e5e-4e5a-8559-66c0705e6b8d",
+          "body": "{\n  \"zipcode\": \"10002\",\n  \"country\": \"United States\",\n  \"state\": \"New York\",\n  \"city\": \"New York County\",\n  \"neighborhood\": \"Manhattan\",\n  \"street\": \"\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "88f97b44-4c1e-4272-9a39-861ee4391d78",
+          "body": "{\n  \"zipcode\": \"10003\",\n  \"country\": \"United States\",\n  \"state\": \"New York\",\n  \"city\": \"New York County\",\n  \"neighborhood\": \"Manhattan\",\n  \"street\": \"\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "d1f92e9b-b041-4b8d-8a55-450429e47ca0",
+          "body": "{\n  \"zipcode\": \"10004\",\n  \"country\": \"United States\",\n  \"state\": \"New York\",\n  \"city\": \"New York County\",\n  \"neighborhood\": \"Manhattan\",\n  \"street\": \"\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    }
+  ],
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "16576927-42fd-45f8-870b-1aa32db1f109"
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    },
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "data": [],
+  "callbacks": []
+}
